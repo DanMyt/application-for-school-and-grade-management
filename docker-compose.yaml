@@ -1,0 +1,39 @@
+version: '3.1'
+
+
+services:
+  postgres-server:
+    container_name: postgres_server
+    image: postgres
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_PASSWORD=schoolnet
+      - POSTGRES_USER=root
+    volumes:
+      - ./tables/init_script:/docker-entrypoint-initdb.d
+
+  spring-boot:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres-server
+
+  react-app:
+    build:
+      context: .
+      dockerfile: frontend/berry-free-react-admin-template/create-react-app/Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - spring-boot
+    links:
+      - spring-boot
+   
+
+
+  
